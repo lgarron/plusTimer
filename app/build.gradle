@@ -6,15 +6,13 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.21.6'
-        classpath 'me.tatarka:gradle-retrolambda:3.3.0-beta4'
+        classpath 'io.fabric.tools:gradle:1.+'
         classpath 'com.fernandocejas.frodo:frodo-plugin:0.8.2'
         classpath 'com.jakewharton.hugo:hugo-plugin:1.2.1'
     }
 }
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
-apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'com.fernandocejas.frodo'
 apply plugin: 'com.jakewharton.hugo'
 
@@ -33,8 +31,8 @@ task syncTask(type: Sync) {
 preBuild.dependsOn('syncTask')
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion '23.0.3'
+    compileSdkVersion 29
+    buildToolsVersion '29.0.2'
 
     packagingOptions {
         exclude 'META-INF/LICENSE'
@@ -88,17 +86,6 @@ android {
             ext.enableCrashlytics = false
         }
     }
-    productFlavors {
-        //noinspection GroovyMissingReturnStatement
-        normal {
-            buildConfigField "boolean", "USE_CRASHLYTICS", "true"
-        }
-        noPermissions {
-            versionName = android.defaultConfig.versionName + "-NoPermissions"
-            buildConfigField "boolean", "USE_CRASHLYTICS", "false"
-            ext.enableCrashlytics = false
-        }
-    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -106,13 +93,7 @@ android {
     }
 }
 
-retrolambda {
-    jvmArgs '-noverify'
-}
-
 dependencies {
-
-    retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:2.3.0'
 
     compile 'com.github.bumptech.glide:glide:3.7.0'
 
@@ -153,7 +134,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.6.2'
     compile 'com.github.afollestad.material-dialogs:core:0.8.5.8'
     compile 'com.rengwuxian.materialedittext:library:2.1.4'
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
         transitive = true;
     }
 
