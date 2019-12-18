@@ -21,6 +21,7 @@ import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.Property;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -822,6 +823,7 @@ public class CurrentSessionTimerFragment extends BasePresenterFragment<CurrentSe
 
         //Currently Timing: User stopping timer
         if (mTiming) {
+            Log.d("asdfasdfasdf", "asdfasdfasdfa");
 
             PuzzleType.getCurrent(getActivity())
                     .flatMap(puzzleType -> puzzleType.getCurrentSessionDeferred(getActivity()))
@@ -838,7 +840,9 @@ public class CurrentSessionTimerFragment extends BasePresenterFragment<CurrentSe
                                 builder.setPenalty(Solve.PENALTY_PLUSTWO);
                             }
 
+
                             s = builder.build();
+                            Log.d("current solve", s.toString());
 
                             setTimerTextFromSolve(s);
                         } catch (CouchbaseLiteException | IOException e) {

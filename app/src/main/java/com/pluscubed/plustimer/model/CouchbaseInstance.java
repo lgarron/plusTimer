@@ -1,6 +1,7 @@
 package com.pluscubed.plustimer.model;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.auth0.api.authentication.AuthenticationAPIClient;
 import com.auth0.api.callback.BaseCallback;
@@ -11,6 +12,7 @@ import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseOptions;
 import com.couchbase.lite.Manager;
+import com.couchbase.lite.QueryOptions;
 import com.couchbase.lite.android.AndroidContext;
 import com.couchbase.lite.replicator.Replication;
 import com.pluscubed.plustimer.R;
@@ -21,6 +23,7 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 
@@ -29,7 +32,8 @@ import rx.schedulers.Schedulers;
 
 public class CouchbaseInstance {
 
-    public static final String DATABASE_URL = "http://192.168.1.4:5984/";
+    public static final String DATABASE_URL = "https://apollo:apollo@couchdb.api.cubing.net/";
+  //  public static final String DATABASE_URL = "https://ajkldjasdsald.com:5984/";
     private static final String DB_SOLVES = "db_solves";
     private static CouchbaseInstance sCouchbaseInstance;
     private Context mContext;
@@ -49,11 +53,12 @@ public class CouchbaseInstance {
 
         DatabaseOptions options = new DatabaseOptions();
         options.setCreate(true);
-        options.setStorageType(Manager.FORESTDB_STORAGE);
         Manager manager = new Manager(new AndroidContext(mContext), Manager.DEFAULT_OPTIONS);
         mDatabase = manager.openDatabase(DB_SOLVES, options);
 
         initApiClient();
+
+        Log.d("REEEEE", "couchbase instance created" + mDatabase.getAllDocs(new QueryOptions()).keySet());
     }
 
     public static CouchbaseInstance get(Context context) throws CouchbaseLiteException, IOException {
@@ -161,12 +166,33 @@ public class CouchbaseInstance {
     public void startReplication() {
         stopReplication();
 
-        String userId = mUser.getId();
-        String database = userId.replace("|", "-").toLowerCase();
+        Log.d("rererer", "start replication");
 
+//        String userId = mUser.getId();
+        String database = "results-apollo";
+
+        URL url = null;
+        try {
+            url = new URL(DATABASE_URL + database);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        mPush = getDatabase().createPushReplication(url);
+        mPull = getDatabase().createPullReplication(url);
+        mPush.setContinuous(true);
+        mPull.setContinuous(true);
+        HashMap<String, Object> requestHeadersParam = new HashMap<>();
+//                requestHeadersParam.put("Authorization", "Bearer " + mIdToken);
+        mPush.setHeaders(requestHeadersParam);
+        mPull.setHeaders(requestHeadersParam);
+        mPush.start();
+        mPull.start();
+        mPull.addChangeListener(event -> {
+        });
+//
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
-                .url(DATABASE_URL + "_peruser_provision?database=" + database + "&username=" + userId)
+                .url(DATABASE_URL)
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -176,20 +202,7 @@ public class CouchbaseInstance {
 
             @Override
             public void onResponse(Response response) throws IOException {
-                URL url = new URL(DATABASE_URL + database);
-                mPush = getDatabase().createPushReplication(url);
-                mPull = getDatabase().createPullReplication(url);
-                mPush.setContinuous(true);
-                mPull.setContinuous(true);
-                HashMap<String, Object> requestHeadersParam = new HashMap<>();
-                requestHeadersParam.put("Authorization", "Bearer " + mIdToken);
-                mPush.setHeaders(requestHeadersParam);
-                mPull.setHeaders(requestHeadersParam);
-                mPush.start();
-                mPull.start();
-                mPull.addChangeListener(event -> {
 
-                });
             }
         });
     }

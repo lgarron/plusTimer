@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
+import android.util.Log;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -276,6 +277,7 @@ public class Solve extends CbObject implements Parcelable {
         }
 
         protected Solve build() throws CouchbaseLiteException, IOException {
+            Log.d("reeeeee", "attempt build solve");
             solve.connectCb(context);
             return solve;
         }

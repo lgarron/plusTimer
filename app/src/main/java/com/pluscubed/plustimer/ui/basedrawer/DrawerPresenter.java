@@ -38,9 +38,7 @@ public class DrawerPresenter<V extends DrawerView> extends Presenter<V> {
         try {
             CouchbaseInstance instance = CouchbaseInstance.get(getView().getContextCompat());
 
-            instance.getLoggedInUser()
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(onUserLoaded(instance));
+            instance.startReplication();
         } catch (CouchbaseLiteException | IOException e) {
             e.printStackTrace();
             if (isViewAttached())
@@ -106,9 +104,7 @@ public class DrawerPresenter<V extends DrawerView> extends Presenter<V> {
 
             @Override
             public void onSuccess(Token token) {
-                instance.signIn(token.getIdToken(), token.getRefreshToken())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(onUserLoaded(instance));
+                instance.startReplication();
             }
         });
         mProvider.start(getView().getContextCompat(), "WCA");

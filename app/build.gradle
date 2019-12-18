@@ -105,8 +105,8 @@ dependencies {
     //compile 'com.firebase:firebase-client-android:2.5.2'
     //compile 'com.firebaseui:firebase-ui:0.3.1'
 
-    compile 'com.couchbase.lite:couchbase-lite-android:0.0.0-738'
-    compile 'com.couchbase.lite:couchbase-lite-android-forestdb:0.0.0-738'
+    compile 'com.couchbase.lite:couchbase-lite-android:1.4.4'
+    compile 'com.couchbase.lite:couchbase-lite-android-forestdb:1.4.4'
     compile 'com.github.oxo42:stateless4j:2.5.0'
 
     compile 'io.reactivex:rxandroid:1.2.0'

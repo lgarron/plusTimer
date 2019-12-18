@@ -2,6 +2,7 @@ package com.pluscubed.plustimer.model;
 
 import android.content.Context;
 import android.support.annotation.WorkerThread;
+import android.util.Log;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
@@ -43,8 +44,13 @@ public abstract class CbObject {
 
     @WorkerThread
     protected CbObject(Context context, String id) throws CouchbaseLiteException, IOException {
+        Log.d("CbObject", id);
         mId = id;
-        CouchbaseInstance.get(context).getDatabase().getDocument(id);
+        try {
+            CouchbaseInstance.get(context).getDatabase().getDocument(id);
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
         updateCb(context);
     }
 
@@ -53,8 +59,14 @@ public abstract class CbObject {
             return (T) sUpdatingObjects.get(docId);
         }
 
-        Document doc = CouchbaseInstance.get(context).getDatabase().getDocument(docId);
-        return fromDoc(doc, type);
+        Log.d("asdfasdf", "get update"  + docId);
+        try {
+            Document doc = CouchbaseInstance.get(context).getDatabase().getDocument(docId);
+            return fromDoc(doc, type);
+        }catch(Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     static <T extends CbObject> T fromDoc(Document doc, Class<T> type) {
@@ -72,13 +84,18 @@ public abstract class CbObject {
     }
 
     protected void connectCb(Context context) throws CouchbaseLiteException, IOException {
+
+        Log.d("reeee", "connecting" );
         Document doc = CouchbaseInstance.get(context).getDatabase().createDocument();
         mId = doc.getId();
+        Log.d("reeee", "connected" + mId );
+
 
         updateCb(context);
     }
 
     protected void updateCb(Context context) {
+        Log.d("asdfasdf", "updating" + mId);
         if (mId == null) {
             return;
         }
@@ -105,7 +122,16 @@ public abstract class CbObject {
     }
 
     public Document getDocument(Context context) throws CouchbaseLiteException, IOException {
-        return CouchbaseInstance.get(context).getDatabase().getDocument(mId);
+        Log.d("asdfasdf", "getdoc" + mId);
+        try {
+            Document document = CouchbaseInstance.get(context).getDatabase().getDocument(mId);
+
+            return document;
+        }catch(Exception e) {
+            Log.d("asdfasdf", "caught");
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public Single<Document> getDocumentDeferred(Context context) {
